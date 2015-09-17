@@ -1,3 +1,5 @@
+package ekp25.orange;
+
 import static org.junit.Assert.*;
 
 import java.math.BigInteger;

@@ -1,3 +1,4 @@
+package ekp25.orange;
 
 public class ProductException extends Exception {
 	
