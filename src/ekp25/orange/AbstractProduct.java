@@ -1,8 +1,6 @@
 package ekp25.orange;
 
-import java.math.BigInteger;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -19,14 +17,21 @@ public abstract class AbstractProduct implements Product {
 		this.description = description;
 	}
 	
+	@FunctionalInterface
 	public interface CreateProduct {
 		public Product create(SerialNumber serialNumber,  Optional<Set<String>> description);
+	}
+	
+	@FunctionalInterface
+	public interface CheckSerial{
+		public boolean isValid(SerialNumber serialNumber);
 	}
 	
 	public static Product make(ProductType productType,SerialNumber serialNumber, Optional<Set<String>>
 							   description) throws ProductException{
 		Map<ProductType, CreateProduct> commands = new HashMap<>();
 
+		//Move these into a separate function
 		CreateProduct createOpod = (serialnum, desc) -> {return new Opod(serialnum, desc); };
 		CreateProduct createOpad = (serialnum, desc) -> {return new Opad(serialnum, desc); };
 		CreateProduct createOwatch = (serialnum, desc) -> {return new Owatch(serialnum, desc); };
@@ -38,51 +43,31 @@ public abstract class AbstractProduct implements Product {
 		commands.put(ProductType.OWATCH, createOwatch);
 		commands.put(ProductType.OTV, createOtv);
 		commands.put(ProductType.OPHONE, createOphone);
-		Product p = (Product) commands.get(ProductType.OPOD).create(serialNumber, description);
+		Product p = (Product) commands.get(productType).create(serialNumber, description); //move this
+		
+		Map<ProductType, CheckSerial> checkValidity = new HashMap<>();
+		
+		CheckSerial checkOpod = (serialnum) -> {return Opod.isValidSerialNumber(serialnum); };
+		CheckSerial checkOpad = (serialnum) -> {return Opad.isValidSerialNumber(serialnum); };
+		CheckSerial checkOwatch = (serialnum) -> {return Owatch.isValidSerialNumber(serialnum); };
+		CheckSerial checkOtv = (serialnum) -> {return Otv.isValidSerialNumber(serialnum); };
+		CheckSerial checkOphone = (serialnum) -> {return Ophone.isValidSerialNumber(serialnum); };
+		
+		checkValidity.put(ProductType.OPOD, checkOpod);
+		checkValidity.put(ProductType.OPAD, checkOpad);
+		checkValidity.put(ProductType.OWATCH, checkOwatch);
+		checkValidity.put(ProductType.OTV, checkOtv);
+		checkValidity.put(ProductType.OPHONE, checkOphone);
+
+		
+		Boolean serialValid = checkValidity.get(productType).isValid(serialNumber);
+		if(!serialValid){
+			throw new ProductException(productType, serialNumber, ProductException.ErrorCode.INVALID_SERIAL_NUMBER);
+		}
+		//check for null
+		
 		
 		return p;
-		
-//		switch (productType){
-//			case OPOD:
-//				if(Opod.isValidSerialNumber(serialNumber)){
-//					return new Opod(serialNumber, description);
-//				}
-//				else{
-//					throw new ProductException(productType, serialNumber, ProductException.ErrorCode.INVALID_SERIAL_NUMBER);
-//				}
-//			case OPAD:
-//				if(Opad.isValidSerialNumber(serialNumber)){
-//					return new Opad(serialNumber, description);
-//				}
-//				else{
-//					throw new ProductException(productType, serialNumber, ProductException.ErrorCode.INVALID_SERIAL_NUMBER);
-//				}
-//			case OWATCH:
-//				if(Owatch.isValidSerialNumber(serialNumber)){
-//					return new Owatch(serialNumber, description);
-//				}
-//				else{
-//					throw new ProductException(productType, serialNumber, ProductException.ErrorCode.INVALID_SERIAL_NUMBER);
-//				}
-//			case OTV:
-//				if(Otv.isValidSerialNumber(serialNumber)){
-//					return new Otv(serialNumber, description);
-//				}
-//				else{
-//					throw new ProductException(productType, serialNumber, ProductException.ErrorCode.INVALID_SERIAL_NUMBER);
-//				}
-//			case OPHONE:
-//				if(Ophone.isValidSerialNumber(serialNumber)){
-//					return new Ophone(serialNumber, description);
-//				}
-//				else{
-//					throw new ProductException(productType, serialNumber, ProductException.ErrorCode.INVALID_SERIAL_NUMBER);
-//				}
-//			default: 
-//				throw new ProductException(productType, serialNumber, ProductException.ErrorCode.INVALID_PRODUCT_TYPE);
-//		}
-		
-		
 	}
 	
 	
@@ -123,17 +108,4 @@ public abstract class AbstractProduct implements Product {
 		return info.toString();
 	}
 	
-
-
-	public static void main(String[] args) throws ProductException{
-
-		BigInteger b = new BigInteger("54736");
-		SerialNumber sn = new SerialNumber(b);
-		Set<String> s = new HashSet<String>();
-		s.add("this is an opod");
-		s.add("not a owatch");
-		Optional<Set<String>> description = Optional.of(s);
-		Product o = make(ProductType.OPOD, sn, description );
-	}
-
 }
