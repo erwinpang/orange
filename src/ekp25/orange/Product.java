@@ -9,5 +9,7 @@ public interface Product {
 	public ProductType getProductType();
 	public String getProductName();
 	public Optional<Set<String>> getDescription();
+	public void process(Exchange request, RequestStatus requestStatus) throws ProductException;
+	public void process(Refund request, RequestStatus requestStats) throws ProductException;
 	
 }

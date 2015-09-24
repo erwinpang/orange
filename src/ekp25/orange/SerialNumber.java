@@ -2,7 +2,7 @@ package ekp25.orange;
 
 import java.math.BigInteger;
 
-public class SerialNumber {
+public class SerialNumber implements Comparable {
 	
 	BigInteger serialNumber;
 	
@@ -35,6 +35,26 @@ public class SerialNumber {
 	
 	public boolean isOdd(){
 		return serialNumber.testBit(0);
+	}
+
+	public int compareTo(SerialNumber other) {
+		if(this.getSerialNumber().equals(other)){
+			return 0;
+		}
+		else if(this.getSerialNumber().compareTo(other.serialNumber) == -1){
+			return -1;
+		}
+		else{
+			return 1;
+		}
+	}
+	
+	@Override
+	public int compareTo(Object o){
+		if(o instanceof SerialNumber){
+			return this.compareTo((SerialNumber) o);
+		}
+		else return this.compareTo(o);
 	}
 
 }

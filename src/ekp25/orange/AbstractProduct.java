@@ -22,50 +22,59 @@ public abstract class AbstractProduct implements Product {
 		public Product create(SerialNumber serialNumber,  Optional<Set<String>> description);
 	}
 	
+	//Instantiate Functional Interface CreateProduct
+	static CreateProduct createOpod = (serialnum, desc) -> {return new Opod(serialnum, desc); };
+	static CreateProduct createOpad = (serialnum, desc) -> {return new Opad(serialnum, desc); };
+	static CreateProduct createOwatch = (serialnum, desc) -> {return new Owatch(serialnum, desc); };
+	static CreateProduct createOtv = (serialnum, desc) -> {return new Otv(serialnum, desc); };
+	static CreateProduct createOphone = (serialnum, desc) -> {return new Ophone(serialnum, desc); };
+	
+	//Map Product Types to constructors
+	static Map<ProductType, CreateProduct> commands = new HashMap<ProductType, CreateProduct>(){{
+		put(ProductType.OPOD, createOpod);
+		put(ProductType.OPAD, createOpad);
+		put(ProductType.OWATCH, createOwatch);
+		put(ProductType.OTV, createOtv);
+		put(ProductType.OPHONE, createOphone);
+	}};
+	
+	//Functional Interface to check validity of Serial numbers
 	@FunctionalInterface
 	public interface CheckSerial{
 		public boolean isValid(SerialNumber serialNumber);
 	}
 	
+	//Instantiate Functional interface CheckSerial
+	static CheckSerial checkOpod = (serialnum) -> {return Opod.isValidSerialNumber(serialnum); };
+	static CheckSerial checkOpad = (serialnum) -> {return Opad.isValidSerialNumber(serialnum); };
+	static CheckSerial checkOwatch = (serialnum) -> {return Owatch.isValidSerialNumber(serialnum); };
+	static CheckSerial checkOtv = (serialnum) -> {return Otv.isValidSerialNumber(serialnum); };
+	static CheckSerial checkOphone = (serialnum) -> {return Ophone.isValidSerialNumber(serialnum); };
+	
+	//Map Product Type to proper serial number checker
+	static Map<ProductType, CheckSerial> checkValidity = new HashMap<ProductType, CheckSerial>(){{
+		put(ProductType.OPOD, checkOpod);
+		put(ProductType.OPAD, checkOpad);
+		put(ProductType.OWATCH, checkOwatch);
+		put(ProductType.OTV, checkOtv);
+		put(ProductType.OPHONE, checkOphone);
+	}};
+	
 	public static Product make(ProductType productType,SerialNumber serialNumber, Optional<Set<String>>
 							   description) throws ProductException{
-		Map<ProductType, CreateProduct> commands = new HashMap<>();
-
-		//Move these into a separate function
-		CreateProduct createOpod = (serialnum, desc) -> {return new Opod(serialnum, desc); };
-		CreateProduct createOpad = (serialnum, desc) -> {return new Opad(serialnum, desc); };
-		CreateProduct createOwatch = (serialnum, desc) -> {return new Owatch(serialnum, desc); };
-		CreateProduct createOtv = (serialnum, desc) -> {return new Otv(serialnum, desc); };
-		CreateProduct createOphone = (serialnum, desc) -> {return new Ophone(serialnum, desc); };
-		
-		commands.put(ProductType.OPOD, createOpod);
-		commands.put(ProductType.OPAD, createOpad);
-		commands.put(ProductType.OWATCH, createOwatch);
-		commands.put(ProductType.OTV, createOtv);
-		commands.put(ProductType.OPHONE, createOphone);
-		Product p = (Product) commands.get(productType).create(serialNumber, description); //move this
-		
-		Map<ProductType, CheckSerial> checkValidity = new HashMap<>();
-		
-		CheckSerial checkOpod = (serialnum) -> {return Opod.isValidSerialNumber(serialnum); };
-		CheckSerial checkOpad = (serialnum) -> {return Opad.isValidSerialNumber(serialnum); };
-		CheckSerial checkOwatch = (serialnum) -> {return Owatch.isValidSerialNumber(serialnum); };
-		CheckSerial checkOtv = (serialnum) -> {return Otv.isValidSerialNumber(serialnum); };
-		CheckSerial checkOphone = (serialnum) -> {return Ophone.isValidSerialNumber(serialnum); };
-		
-		checkValidity.put(ProductType.OPOD, checkOpod);
-		checkValidity.put(ProductType.OPAD, checkOpad);
-		checkValidity.put(ProductType.OWATCH, checkOwatch);
-		checkValidity.put(ProductType.OTV, checkOtv);
-		checkValidity.put(ProductType.OPHONE, checkOphone);
-
 		
 		Boolean serialValid = checkValidity.get(productType).isValid(serialNumber);
+		
+		//Check if Serial Number is Valid
+		//Check that product type is not null
 		if(!serialValid){
 			throw new ProductException(productType, serialNumber, ProductException.ErrorCode.INVALID_SERIAL_NUMBER);
 		}
-		//check for null
+		else if(commands.get(productType) == null){
+			throw new ProductException(productType, serialNumber, ProductException.ErrorCode.INVALID_PRODUCT_TYPE);
+		}
 		
+		Product p = (Product) commands.get(productType).create(serialNumber, description); 
 		
 		return p;
 	}

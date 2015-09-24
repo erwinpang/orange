@@ -4,6 +4,8 @@ import java.math.BigInteger;
 import java.util.Optional;
 import java.util.Set;
 
+import ekp25.orange.ProductException.ErrorCode;
+
 public class Otv extends AbstractProduct{
 	
 	SerialNumber serialNumber;
@@ -24,5 +26,13 @@ public class Otv extends AbstractProduct{
 		SerialNumber ser = new SerialNumber(bigInt);
 		int gcdValue = serialNumber.gcd(ser).intValue();
 		return (serialNumber.isOdd() && (gcdValue > 42 ));
+	}
+	
+	public void process(Exchange request, RequestStatus requestStatus) throws ProductException{
+		throw new ProductException(ProductType.OTV, this.serialNumber, ErrorCode.UNSUPPORTED_OPERATION);
+	}
+	
+	public void process(Refund request, RequestStatus requestStats) throws ProductException{
+		throw new ProductException(ProductType.OTV, this.serialNumber, ErrorCode.UNSUPPORTED_OPERATION);
 	}
 }
