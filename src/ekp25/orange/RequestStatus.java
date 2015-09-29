@@ -16,7 +16,7 @@ public class RequestStatus {
 	
 	public RequestStatus(){
 		this.statusCode = StatusCode.UNKNOWN;
-		result = Optional.ofNullable(null);
+		result = Optional.empty();
 	}
 	
 	public StatusCode getStatusCode(){

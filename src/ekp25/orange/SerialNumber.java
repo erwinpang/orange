@@ -4,7 +4,7 @@ import java.math.BigInteger;
 
 public class SerialNumber implements Comparable {
 	
-	BigInteger serialNumber;
+	private BigInteger serialNumber;
 	
 	public SerialNumber(BigInteger serialNumber){
 		this.serialNumber = serialNumber;

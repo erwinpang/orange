@@ -1,9 +1,12 @@
 package ekp25.orange;
 
+import java.util.NavigableSet;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TreeSet;
 
 import ekp25.orange.ProductException.ErrorCode;
+import ekp25.orange.RequestStatus.StatusCode;
 
 public final class Opod extends AbstractProduct{
 	SerialNumber serialNumber;
@@ -24,10 +27,24 @@ public final class Opod extends AbstractProduct{
 	}
 	
 	public void process(Exchange request, RequestStatus requestStatus) throws ProductException{
-		throw new ProductException(ProductType.OPOD, this.serialNumber, ErrorCode.UNSUPPORTED_OPERATION);
+		NavigableSet<SerialNumber> compatibleProducts = new TreeSet<SerialNumber>(request.getCompatibleProducts());
+		if(compatibleProducts.isEmpty()){
+			throw new ProductException(ProductType.OPOD, this.serialNumber, ErrorCode.UNSUPPORTED_OPERATION);
+		}
+		else{
+			requestStatus.setStatusCode(StatusCode.OK);
+			requestStatus.setResult(Optional.of(compatibleProducts.first().getSerialNumber()));
+		}
 	}
 	
-	public void process(Refund request, RequestStatus requestStats) throws ProductException{
-		throw new ProductException(ProductType.OPOD, this.serialNumber, ErrorCode.UNSUPPORTED_OPERATION);
+	public void process(Refund request, RequestStatus requestStatus) throws ProductException{
+		if(request.getRma().gcd(this.serialNumber.getSerialNumber()).intValue() > 24){
+			requestStatus.setStatusCode(StatusCode.OK);
+			requestStatus.setResult(Optional.empty());
+		}
+		else{
+
+			throw new ProductException(ProductType.OPOD, this.serialNumber, ErrorCode.UNSUPPORTED_OPERATION);
+		}
 	}
 }

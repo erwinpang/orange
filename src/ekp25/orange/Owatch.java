@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import ekp25.orange.ProductException.ErrorCode;
+import ekp25.orange.RequestStatus.StatusCode;
 
 public class Owatch extends AbstractProduct{
 	
@@ -29,10 +30,23 @@ public class Owatch extends AbstractProduct{
 	}
 	
 	public void process(Exchange request, RequestStatus requestStatus) throws ProductException{
-		throw new ProductException(ProductType.OWATCH, this.serialNumber, ErrorCode.UNSUPPORTED_OPERATION);
+		SerialNumber potentialExchange = request.getCompatibleProducts().higher(this.serialNumber);
+		if( potentialExchange == null){
+			throw new ProductException(ProductType.OWATCH, this.serialNumber, ErrorCode.UNSUPPORTED_OPERATION);
+		}
+		else{
+			requestStatus.setStatusCode(StatusCode.OK);
+			requestStatus.setResult(Optional.of(potentialExchange.getSerialNumber()));
+		}
 	}
 	
-	public void process(Refund request, RequestStatus requestStats) throws ProductException{
+	public void process(Refund request, RequestStatus requestStatus) throws ProductException{
+		if(request.getRma().xor(this.getSerialNumber().getSerialNumber()).intValue() > 14){
+			requestStatus.setStatusCode(StatusCode.OK);
+			requestStatus.setResult(Optional.empty());
+		}
+		else{
 		throw new ProductException(ProductType.OWATCH, this.serialNumber, ErrorCode.UNSUPPORTED_OPERATION);
+		}
 	}
 }

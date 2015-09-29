@@ -3,6 +3,7 @@ package ekp25.orange;
 import java.math.BigInteger;
 
 import ekp25.orange.RequestException.ErrorCode;
+import ekp25.orange.RequestStatus.StatusCode;
 
 public final class Refund implements Request {
 	
@@ -14,16 +15,15 @@ public final class Refund implements Request {
 
 	@Override
 	public void process(Product product, RequestStatus status) throws RequestException {
-		if(status.getStatusCode() == RequestStatus.StatusCode.OK){
-			new Refund.Builder().setRma(null).build();
-		}
-		else{
-			throw new RequestException(ErrorCode.INVALID_REQUEST);
+		try{
+		     product.process(this, status);
+		} catch (ProductException e){
+		     status.setStatusCode(StatusCode.FAIL);
 		}
 	}
 	
 	public BigInteger getRma(){
-		return rma;
+		return new BigInteger(this.rma.toString());
 	}
 	
 	public static class Builder{

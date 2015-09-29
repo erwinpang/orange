@@ -4,7 +4,7 @@ import java.util.NavigableSet;
 import java.util.Set;
 import java.util.TreeSet;
 
-import ekp25.orange.RequestException.ErrorCode;
+import ekp25.orange.RequestStatus.StatusCode;
 
 public final class Exchange implements Request{
 	private final NavigableSet<SerialNumber> compatibleProducts;
@@ -15,19 +15,15 @@ public final class Exchange implements Request{
 
 	@Override
 	public void process(Product product, RequestStatus status) throws RequestException {
-		if(status.getStatusCode() == RequestStatus.StatusCode.OK){
-			compatibleProducts.add(product.getSerialNumber());
-		}
-		else{
-			throw new RequestException(ErrorCode.INVALID_REQUEST);
+		try{
+		     product.process(this, status);
+		} catch (ProductException e){
+		     status.setStatusCode(StatusCode.FAIL);
 		}
 	}
 	
 	public NavigableSet<SerialNumber> getCompatibleProducts(){
-		NavigableSet<SerialNumber> copySet = new TreeSet<SerialNumber>();
-		for(SerialNumber s : compatibleProducts){
-			copySet.add(s);
-		}
+		NavigableSet<SerialNumber> copySet = new TreeSet<SerialNumber>(compatibleProducts);
 		return copySet;
 	}
 	
@@ -40,7 +36,7 @@ public final class Exchange implements Request{
 		}
 		
 		public Set<SerialNumber> getCompatibleProducts(){
-			return compatibleProducts;
+			return new TreeSet<SerialNumber>(compatibleProducts);
 		}
 		
 		public Exchange build(){
