@@ -29,7 +29,7 @@ public final class Opod extends AbstractProduct{
 	public void process(Exchange request, RequestStatus requestStatus) throws ProductException{
 		NavigableSet<SerialNumber> compatibleProducts = new TreeSet<SerialNumber>(request.getCompatibleProducts());
 		if(compatibleProducts.isEmpty()){
-			throw new ProductException(ProductType.OPOD, this.serialNumber, ErrorCode.UNSUPPORTED_OPERATION);
+			throw new ProductException(ProductType.OPOD, this.getSerialNumber(), ErrorCode.UNSUPPORTED_OPERATION);
 		}
 		else{
 			requestStatus.setStatusCode(StatusCode.OK);
@@ -38,13 +38,13 @@ public final class Opod extends AbstractProduct{
 	}
 	
 	public void process(Refund request, RequestStatus requestStatus) throws ProductException{
-		if(request.getRma().gcd(this.serialNumber.getSerialNumber()).intValue() > 24){
+		if(request.getRma().gcd(this.getSerialNumber().getSerialNumber()).intValue() > 24){
 			requestStatus.setStatusCode(StatusCode.OK);
 			requestStatus.setResult(Optional.empty());
 		}
 		else{
 
-			throw new ProductException(ProductType.OPOD, this.serialNumber, ErrorCode.UNSUPPORTED_OPERATION);
+			throw new ProductException(ProductType.OPOD, this.getSerialNumber(), ErrorCode.UNSUPPORTED_OPERATION);
 		}
 	}
 }

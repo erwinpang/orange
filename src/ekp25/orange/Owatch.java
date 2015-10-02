@@ -30,9 +30,9 @@ public class Owatch extends AbstractProduct{
 	}
 	
 	public void process(Exchange request, RequestStatus requestStatus) throws ProductException{
-		SerialNumber potentialExchange = request.getCompatibleProducts().higher(this.serialNumber);
+		SerialNumber potentialExchange = request.getCompatibleProducts().higher(this.getSerialNumber());
 		if( potentialExchange == null){
-			throw new ProductException(ProductType.OWATCH, this.serialNumber, ErrorCode.UNSUPPORTED_OPERATION);
+			throw new ProductException(ProductType.OWATCH, this.getSerialNumber(), ErrorCode.UNSUPPORTED_OPERATION);
 		}
 		else{
 			requestStatus.setStatusCode(StatusCode.OK);
@@ -46,7 +46,7 @@ public class Owatch extends AbstractProduct{
 			requestStatus.setResult(Optional.empty());
 		}
 		else{
-		throw new ProductException(ProductType.OWATCH, this.serialNumber, ErrorCode.UNSUPPORTED_OPERATION);
+			throw new ProductException(ProductType.OWATCH, this.getSerialNumber(), ErrorCode.UNSUPPORTED_OPERATION);
 		}
 	}
 }

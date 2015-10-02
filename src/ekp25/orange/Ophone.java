@@ -31,7 +31,7 @@ public class Ophone extends AbstractProduct{
 	public void process(Exchange request, RequestStatus requestStatus) throws ProductException{
 		SerialNumber exchange = findExchange(request);
 		if(exchange == null){
-			throw new ProductException(ProductType.OPHONE, this.serialNumber, ErrorCode.UNSUPPORTED_OPERATION);
+			throw new ProductException(ProductType.OPHONE, this.getSerialNumber(), ErrorCode.UNSUPPORTED_OPERATION);
 		}
 		else{
 			requestStatus.setStatusCode(StatusCode.OK);
@@ -42,13 +42,13 @@ public class Ophone extends AbstractProduct{
 	//An oPhone refund succeeds if and only if the serial number can be obtained
 	//by shifting to the left the RMA by 1, 2, or 3 bits
 	public void process(Refund request, RequestStatus requestStatus) throws ProductException{
-		boolean successfulRefund = checkRma(this.serialNumber.getSerialNumber(), request.getRma());
+		boolean successfulRefund = checkRma(this.getSerialNumber().getSerialNumber(), request.getRma());
 		if(successfulRefund){
 			requestStatus.setStatusCode(StatusCode.OK);
 			requestStatus.setResult(Optional.empty());
 		}
 		else{
-			throw new ProductException(ProductType.OPHONE, this.serialNumber, ErrorCode.UNSUPPORTED_OPERATION);
+			throw new ProductException(ProductType.OPHONE, this.getSerialNumber(), ErrorCode.UNSUPPORTED_OPERATION);
 		}
 	}
 	
@@ -68,7 +68,7 @@ public class Ophone extends AbstractProduct{
 	}
 	
 	public SerialNumber findExchange(Exchange request){
-		NavigableSet<SerialNumber> compatibleProducts = request.getCompatibleProducts().tailSet(this.serialNumber, false);
+		NavigableSet<SerialNumber> compatibleProducts = request.getCompatibleProducts().tailSet(this.getSerialNumber(), false);
 		int total = 0;
 		int numElements = 0;
 		for(SerialNumber s : compatibleProducts){

@@ -5,6 +5,8 @@ import java.math.BigInteger;
 import ekp25.orange.RequestException.ErrorCode;
 import ekp25.orange.RequestStatus.StatusCode;
 
+
+
 public final class Refund implements Request {
 	
 	private final BigInteger rma;
@@ -43,8 +45,13 @@ public final class Refund implements Request {
 			return rma;
 		}
 		
-		public Refund build(){
-			return new Refund(this);
+		public Refund build() throws RequestException{
+			if(rma == null){
+				throw new RequestException(ErrorCode.INVALID_RMA);
+			}
+			else{
+				return new Refund(this);
+			}
 		}
 		
 	}

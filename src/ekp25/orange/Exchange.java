@@ -10,7 +10,7 @@ public final class Exchange implements Request{
 	private final NavigableSet<SerialNumber> compatibleProducts;
 	
 	private Exchange(Builder builder){
-		this.compatibleProducts = builder.compatibleProducts;
+		this.compatibleProducts = (NavigableSet<SerialNumber>) builder.getCompatibleProducts();
 	}
 
 	@Override
@@ -23,8 +23,7 @@ public final class Exchange implements Request{
 	}
 	
 	public NavigableSet<SerialNumber> getCompatibleProducts(){
-		NavigableSet<SerialNumber> copySet = new TreeSet<SerialNumber>(compatibleProducts);
-		return copySet;
+		return new TreeSet<SerialNumber>(compatibleProducts);
 	}
 	
 	public static class Builder{

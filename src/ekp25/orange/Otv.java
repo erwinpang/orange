@@ -33,7 +33,7 @@ public class Otv extends AbstractProduct{
 	public void process(Exchange request, RequestStatus requestStatus) throws ProductException{
 		SerialNumber exchange = findExchange(request);
 		if(exchange == null){
-			throw new ProductException(ProductType.OPHONE, this.serialNumber, ErrorCode.UNSUPPORTED_OPERATION);
+			throw new ProductException(ProductType.OPHONE, this.getSerialNumber(), ErrorCode.UNSUPPORTED_OPERATION);
 		}
 		else{
 			requestStatus.setStatusCode(StatusCode.OK);
@@ -48,16 +48,16 @@ public class Otv extends AbstractProduct{
 			requestStatus.setResult(Optional.empty());
 		}
 		else{
-					throw new ProductException(ProductType.OTV, this.serialNumber, ErrorCode.UNSUPPORTED_OPERATION);
+			throw new ProductException(ProductType.OTV, this.getSerialNumber(), ErrorCode.UNSUPPORTED_OPERATION);
 		}
 	}
 	
 	public SerialNumber findExchange(Exchange request){
 		BigInteger range = new BigInteger("1024");
-		BigInteger topLimit = this.serialNumber.getSerialNumber().add(range);
+		BigInteger topLimit = this.getSerialNumber().getSerialNumber().add(range);
 		SerialNumber topLimiter = new SerialNumber(topLimit);
 		NavigableSet<SerialNumber> compatibleProducts = request.getCompatibleProducts()
-															   .tailSet(this.serialNumber, false)
+															   .tailSet(this.getSerialNumber(), false)
 															   .headSet(topLimiter, true);
 		int total = 0;
 		int numElements = 0;
